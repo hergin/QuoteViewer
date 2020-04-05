@@ -145,7 +145,7 @@ public class QuoteManager {
                 throw new QuoteIdNotExistsException(id);
             }
         } catch (SQLException e) {
-            throw new QuoteException("Something happened when delete quote!", e);
+            throw new QuoteException("Something happened when deleting quote!", e);
         }
     }
 
