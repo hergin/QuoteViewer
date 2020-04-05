@@ -9,6 +9,7 @@ import exceptions.QuoteIdNotExistsException;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class QuoteManager {
@@ -48,8 +49,18 @@ public class QuoteManager {
      * @throws QuoteException         for any other exceptions.
      */
     public Quote addQuote(Quote quote) {
-        // TODO
-        return null;
+        try {
+            int id = quote.getId();
+
+            if (quoteDao.idExists(id)) {
+                throw new QuoteIdExistsException(id);
+            } else {
+                var addedQuote = quoteDao.createIfNotExists(quote);
+                return (addedQuote);
+            }
+        } catch (SQLException e) {
+            throw new QuoteException("Something happened on id check and update!", e);
+        }
     }
 
     /**
@@ -59,8 +70,21 @@ public class QuoteManager {
      * @throws QuoteException for any other exceptions.
      */
     public List<Quote> getAllQuotes() {
-        // TODO
-        return null;
+        try
+        {
+            List<Quote> quoteList = new ArrayList<Quote>();
+            var allQuotes = quoteDao.queryForAll();
+
+            for (int i = 0; i < allQuotes.size(); i++)
+            {
+                quoteList.add(allQuotes.get(i));
+            }
+            return quoteList;
+        }
+        catch(SQLException e)
+        {
+            throw new QuoteException("Something happened on id check and update!", e);
+        }
     }
 
     /**
@@ -97,8 +121,24 @@ public class QuoteManager {
      * @throws QuoteException            for any other exceptions.
      */
     public Quote updateQuoteFrom(int id, String from) {
-        // TODO
-        return null;
+
+        try
+        {
+            if (quoteDao.idExists(id))
+            {
+                var quote = quoteDao.queryForId(id);
+                quoteDao.update(new Quote(id, quote.getQuote(), from));
+                return quoteDao.queryForId(id);
+            }
+            else
+            {
+                throw new QuoteIdNotExistsException(id);
+            }
+        }
+        catch (SQLException e)
+        {
+            throw new QuoteException("Something happened on id check and update!", e);
+        }
     }
 
     /**
@@ -110,8 +150,23 @@ public class QuoteManager {
      * @throws QuoteException            for any other exceptions.
      */
     public Quote deleteQuote(int id) {
-        // TODO
-        return null;
+        try
+        {
+            if (quoteDao.idExists(id))
+            {
+                var deletedQuotes = quoteDao.queryForId(id);
+                quoteDao.delete(quoteDao.queryForId(id));
+                return deletedQuotes;
+            }
+            else
+            {
+                throw new QuoteIdNotExistsException(id);
+            }
+        }
+        catch (SQLException e)
+        {
+            throw new QuoteException("Something happened on id check and update!", e);
+        }
     }
 
     public void disposeResources() {
