@@ -139,7 +139,7 @@ public class QuoteManager {
         try {
             if(quoteDao.idExists(id)){
                 Quote quote = quoteDao.queryForId(id);
-                quoteDao.delete(quoteDao.queryForId(id));
+                quoteDao.deleteById(id);
                 return quote;
             }else{
                 throw new QuoteIdNotExistsException(id);
