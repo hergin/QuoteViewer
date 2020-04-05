@@ -9,6 +9,7 @@ import exceptions.QuoteIdNotExistsException;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class QuoteManager {
@@ -49,7 +50,19 @@ public class QuoteManager {
      */
     public Quote addQuote(Quote quote) {
         // TODO
-        return null;
+        try{
+            var id = quote.getId();
+            if (quoteDao.idExists(id)){
+                throw new QuoteIdExistsException(id);
+            }
+            else {
+                var addsQuote = quoteDao.createIfNotExists(quote);
+                return addsQuote;
+            }
+        }
+        catch (SQLException e){
+            throw new QuoteException("Something happend on id check and update!",e);
+        }
     }
 
     /**
@@ -60,7 +73,18 @@ public class QuoteManager {
      */
     public List<Quote> getAllQuotes() {
         // TODO
-        return null;
+        try {
+            List<Quote> quoteList = new ArrayList<Quote>();
+            var listOfQuotes = quoteDao.queryForAll();
+
+            for (int i = 0; i < listOfQuotes.size(); i++) {
+                listOfQuotes.get(i);
+            }
+            return listOfQuotes;
+        }
+        catch (SQLException e){
+            throw new QuoteException("Something happened on id check and update!", e);
+        }
     }
 
     /**
@@ -98,7 +122,19 @@ public class QuoteManager {
      */
     public Quote updateQuoteFrom(int id, String from) {
         // TODO
-        return null;
+        try{
+            if (quoteDao.idExists(id)){
+                var aQuote = quoteDao.queryForId(id);
+                quoteDao.update(new Quote(id,aQuote.getQuote(),from));
+                return quoteDao.queryForId(id);
+            } else {
+                throw new QuoteIdNotExistsException(id);
+            }
+        }
+        catch (SQLException e){
+            throw new QuoteException("Something happened trying to update the quote",e);
+        }
+
     }
 
     /**
@@ -111,7 +147,19 @@ public class QuoteManager {
      */
     public Quote deleteQuote(int id) {
         // TODO
-        return null;
+        try{
+            if (quoteDao.idExists(id)){
+                var removeQuote = quoteDao.queryForId(id);
+                quoteDao.delete(quoteDao.queryForId(id));
+                return removeQuote;
+            }
+            else {
+                throw new QuoteIdNotExistsException(id);
+            }
+        }
+        catch (SQLException e){
+            throw new QuoteException("Something happened trying to update the quote",e);
+        }
     }
 
     public void disposeResources() {
