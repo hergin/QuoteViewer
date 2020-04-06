@@ -9,6 +9,7 @@ import exceptions.QuoteIdNotExistsException;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.LinkedList;
 import java.util.List;
 
 public class QuoteManager {
@@ -49,7 +50,12 @@ public class QuoteManager {
      */
     public Quote addQuote(Quote quote) {
         // TODO
-        return null;
+        try {
+            quoteDao.create(quote);
+            return quote;
+        }catch (SQLException e){
+            throw new QuoteIdExistsException(quote.getId());
+        }
     }
 
     /**
@@ -60,7 +66,12 @@ public class QuoteManager {
      */
     public List<Quote> getAllQuotes() {
         // TODO
-        return null;
+        List<Quote> quoteList = new LinkedList<>();
+        for (Quote quote:
+                quoteDao) {
+            quoteList.add(quote);
+        }
+        return quoteList;
     }
 
     /**
@@ -98,7 +109,19 @@ public class QuoteManager {
      */
     public Quote updateQuoteFrom(int id, String from) {
         // TODO
-        return null;
+        try{
+            for (Quote quote : quoteDao) {
+                if (quote.getId() == id) {
+                    int theId = quote.getId();
+                    String theQuote = quote.getQuote();
+                    System.out.println(deleteQuote(id));
+                    return(quoteDao.createIfNotExists(new Quote(theId, theQuote, from)));
+                }
+            }
+            throw new QuoteIdNotExistsException(id);
+        }catch(SQLException e){
+            throw new QuoteException("Something went wrong when updating the quote!", e);
+        }
     }
 
     /**
@@ -111,7 +134,17 @@ public class QuoteManager {
      */
     public Quote deleteQuote(int id) {
         // TODO
-        return null;
+        try {
+            if(quoteDao.idExists(id)){
+                Quote quote = quoteDao.queryForId(id);
+                quoteDao.deleteById(id);
+                return quote;
+            }else{
+                throw new QuoteIdNotExistsException(id);
+            }
+        }catch (SQLException e){
+            throw new QuoteIdNotExistsException(id);
+        }
     }
 
     public void disposeResources() {
