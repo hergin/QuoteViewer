@@ -25,6 +25,7 @@ class QuoteManagerTest {
 
         // Add test data in the already tested way!
         var testConnection = new JdbcConnectionSource("jdbc:sqlite:test.db");
+        TableUtils.dropTable(testConnection, Quote.class, true);
         TableUtils.createTableIfNotExists(testConnection, Quote.class);
         Dao<Quote, Integer> quoteDao = DaoManager.createDao(testConnection, Quote.class);
         for (int i = 0; i < 3; i++) {

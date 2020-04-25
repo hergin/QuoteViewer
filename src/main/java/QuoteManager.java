@@ -49,7 +49,17 @@ public class QuoteManager {
      */
     public Quote addQuote(Quote quote) {
         // TODO
-        return null;
+        try {
+            int id =quote.getId();
+            if (quoteDao.idExists(id)){
+                throw new QuoteIdExistsException(id);
+            }else {
+                Quote newQuote = quoteDao.createIfNotExists(quote);
+                return newQuote;
+            }
+        } catch (SQLException e) {
+            throw new QuoteException("Something happened when adding quote",e);
+        }
     }
 
     /**
@@ -60,7 +70,12 @@ public class QuoteManager {
      */
     public List<Quote> getAllQuotes() {
         // TODO
-        return null;
+        try {
+            List<Quote> AllQuotes = quoteDao.queryForAll();
+            return AllQuotes;
+        } catch (SQLException e) {
+            throw new QuoteException("Something happened when getting all quotes", e);
+        }
     }
 
     /**
@@ -98,7 +113,17 @@ public class QuoteManager {
      */
     public Quote updateQuoteFrom(int id, String from) {
         // TODO
-        return null;
+        try {
+            if (quoteDao.idExists(id)) {
+                var theQuote = quoteDao.queryForId(id);
+                quoteDao.update(new Quote(id, theQuote.getQuote(), from));
+                return quoteDao.queryForId(id);
+            } else {
+                throw new QuoteIdNotExistsException(id);
+            }
+        } catch (SQLException e) {
+            throw new QuoteException("Something happened on id check and update!", e);
+        }
     }
 
     /**
@@ -111,7 +136,17 @@ public class QuoteManager {
      */
     public Quote deleteQuote(int id) {
         // TODO
-        return null;
+        try {
+            if(quoteDao.idExists(id)){
+                Quote quote = quoteDao.queryForId(id);
+                quoteDao.deleteById(id);
+                return quote;
+            }else{
+                throw new QuoteIdNotExistsException(id);
+            }
+        } catch (SQLException e) {
+            throw new QuoteException("Something happened when deleting quote!", e);
+        }
     }
 
     public void disposeResources() {
